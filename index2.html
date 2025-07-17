@@ -953,7 +953,7 @@
             
             ymaps.ready(function() {
                 // Координаты фитнес-клуба (пример)
-                const clubCoordinates = [55.751244, 37.618423]; // Центр Москвы
+                const clubCoordinates = [56.829805, 60.599889]; // Грин фитнесс, в гринвиче
                 
                 // Создание карты
                 const map = new ymaps.Map('map', {
@@ -964,8 +964,8 @@
                 
                 // Создание метки
                 const placemark = new ymaps.Placemark(clubCoordinates, {
-                    hintContent: 'Фитнес-клуб "Энерджи"',
-                    balloonContent: 'г. Москва, ул. Спортивная, 15'
+                    hintContent: 'Фитнес-клуб "Green Fitness"',
+                    balloonContent: 'г. Екатеринбург, ул. 8 Марта, 46'
                 }, {
                     iconLayout: 'default#image',
                     iconImageHref: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
