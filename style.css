@@ -578,3 +578,15 @@ footer {
         padding: 20px;
     }
 }
+/* Проба нового стиля, конец файла */
+@media (max-width: 768px) {
+    body.menu-open {
+        overflow: hidden;
+    }
+}
+
+.service-card.active {
+    border: 2px solid var(--accent-green);
+    box-shadow: 0 0 20px rgba(0, 255, 127, 0.7);
+    transform: scale(1.03);
+}
