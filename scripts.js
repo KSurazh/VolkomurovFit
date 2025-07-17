@@ -16,35 +16,73 @@ document.querySelectorAll('nav a').forEach(link => {
 });
 
 // Прокрутка к форме оплаты
-function scrollToPayment() {
+const headerPaymentBtn = document.getElementById('headerPaymentBtn');
+headerPaymentBtn.addEventListener('click', () => {
     document.getElementById('payment-form').scrollIntoView({
         behavior: 'smooth'
     });
-}
+});
 
-// Расчет суммы оплаты
+// Выбор услуги
+const serviceCards = document.querySelectorAll('.service-card');
 const serviceSelect = document.getElementById('service');
 const amountInput = document.getElementById('amount');
 
+// Обработчики для карточек услуг
+serviceCards.forEach(card => {
+    card.addEventListener('click', () => {
+        // Убираем выделение со всех карточек
+        serviceCards.forEach(c => c.classList.remove('active'));
+        
+        // Добавляем выделение текущей карточке
+        card.classList.add('active');
+        
+        // Получаем данные из карточки
+        const service = card.dataset.service;
+        const price = card.dataset.price;
+        
+        // Устанавливаем значения в форму
+        serviceSelect.value = service;
+        amountInput.value = `${price} ₽`;
+    });
+});
+
+// Обработчик для выпадающего списка
 serviceSelect.addEventListener('change', () => {
+    // Убираем выделение со всех карточек
+    serviceCards.forEach(c => c.classList.remove('active'));
+    
+    // Если выбрана услуга, находим соответствующую карточку
+    if (serviceSelect.value) {
+        const selectedCard = document.querySelector(`.service-card[data-service="${serviceSelect.value}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('active');
+        }
+    }
+    
+    // Обновляем сумму
+    updateAmount();
+});
+
+// Функция обновления суммы
+function updateAmount() {
     switch(serviceSelect.value) {
         case 'single':
-            amountInput.value = '2 150 ₽';
+            amountInput.value = '2150 ₽';
             break;
         case 'package':
-            amountInput.value = '10 000 ₽';
+            amountInput.value = '10000 ₽';
             break;
         case 'plan':
-            amountInput.value = '7 000 ₽';
+            amountInput.value = '7000 ₽';
             break;
         default:
             amountInput.value = '';
     }
-});
+}
 
 // Отправка формы оплаты
 const paymentForm = document.getElementById('paymentForm');
-
 paymentForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
@@ -60,7 +98,6 @@ paymentForm.addEventListener('submit', (e) => {
 
 // Отправка формы в Telegram
 const contactForm = document.getElementById('contactForm');
-
 contactForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
