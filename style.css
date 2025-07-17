@@ -1,3 +1,4 @@
+/* Основные стили */
 :root {
     --bg-dark: #0a0a0a;
     --text-light: #ffffff;
@@ -261,12 +262,20 @@ nav a:hover::after {
     padding: 30px;
     transition: var(--transition);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
 }
 
 .service-card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
     border-color: var(--accent-green);
-    box-shadow: 0 15px 30px rgba(0, 255, 127, 0.2);
+    box-shadow: 0 10px 20px rgba(0, 255, 127, 0.2);
+}
+
+.service-card.active {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 20px rgba(0, 255, 127, 0.5);
+    transform: scale(1.03);
+    background: rgba(0, 255, 127, 0.05);
 }
 
 .service-icon {
@@ -393,6 +402,7 @@ nav a:hover::after {
 #map {
     width: 100%;
     height: 100%;
+    background: #f0f0f0;
 }
 
 .map-overlay {
@@ -562,5 +572,9 @@ footer {
         left: 10px;
         right: 10px;
         max-width: none;
+    }
+    
+    .service-card {
+        padding: 20px;
     }
 }
