@@ -1,228 +1,178 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Семён Волкомуров | Персональный тренер</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PHBhdGggZD0iTTE1OC45MiA0MDEuMDhIMzUzLjA4VjExMC45MkgxNTguOTJaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTQwNS44OSAyODUuOTJIMTA2LjExVjIyNi4wOEg0MDUuODlaIiBmaWxsPSIjZmZmIi8+PC9zdmc+" type="image/svg+xml">
+  <meta charset="UTF-8" />
+  <title>Персональный тренер — Семён Волкомуров | VolkomurovFit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Персональные тренировки, пакеты занятий и индивидуальные планы от Семёна Волкомурова. Екатеринбург, ул. 8 марта, 46 — Фитнес-клуб «Green Fitness»." />
+  <!-- Цвет адресной строки в мобильных браузерах -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F8F9FA">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212">
+  <link rel="preconnect" href="https://api.telegram.org" crossorigin>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <!-- Шапка -->
-    <header>
-        <div class="container header-container">
-            <div class="logo">VolkomurovFit</div>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-            <nav id="mainNav">
-                <ul>
-                    <li><a href="#about">Обо мне</a></li>
-                    <li><a href="#services">Услуги</a></li>
-                    <li><a href="#contact">Контакты</a></li>
-                    <li><button class="payment-btn" id="headerPaymentBtn">Оплата</button></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+  <a class="skip-link" href="#main">Перейти к основному содержимому</a>
 
-    <!-- Hero секция -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Персональный тренер <span class="highlight">Семён Волкомуров</span></h1>
-                <p>Профессиональные тренировки для достижения ваших фитнес-целей. Индивидуальный подход и гарантированный результат.</p>
-                <a href="#contact" class="btn">Записаться на тренировку</a>
-            </div>
+  <header class="site-header">
+    <div class="container header-inner">
+      <button id="menu-toggle" class="icon-button burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav-menu">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
+
+      <a href="#" class="logo" aria-label="На главную">VolkomurovFit</a>
+
+      <nav id="nav-menu" class="nav" role="navigation" aria-label="Главное меню">
+        <ul class="nav-list">
+          <li><a href="#about" class="nav-link">Обо мне</a></li>
+          <li><a href="#services" class="nav-link">Услуги</a></li>
+          <li><a href="#contact" class="nav-link">Контакты</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button id="theme-toggle" class="icon-button theme" aria-label="Переключить тему" aria-pressed="false" title="Светлая/тёмная тема">🌙</button>
+        <button id="payment-button" class="primary-btn cta" type="button" title="Перейти к оплате">Оплата</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero section">
+      <div class="container hero-inner">
+        <div class="hero-text glass">
+          <h1>Персональный тренер <span class="nowrap">Семён Волкомуров</span></h1>
+          <p class="lead">Профессиональные тренировки для достижения ваших фитнес-целей. Индивидуальный подход и поддержка на каждом этапе.</p>
+          <a class="primary-btn" href="#contact">Записаться на тренировку</a>
         </div>
+      </div>
     </section>
 
     <!-- Обо мне -->
-    <section id="about" class="about">
-        <div class="container">
-            <h2 class="section-title">Обо мне</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <p>Привет! Я сертифицированный персональный тренер с 3-летним опытом работы. Моя специализация - создание индивидуальных программ тренировок и питания для достижения ваших целей.</p>
-                    <p>Я закончил специализированную программу подготовки тренеров в спортивном клубе "Bright Fitness" и постоянно совершенствую свои знания, посещая международные семинары и курсы.</p>
-                    <p>Мой подход основан на научно обоснованных методиках, индивидуальном подходе к каждому клиенту и постоянной поддержке на пути к вашей цели.</p>
-                    
-                    <div class="stats">
-                        <div class="stat-item">
-                            <div class="stat-value">3+</div>
-                            <div class="stat-label">года опыта</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">100+</div>
-                            <div class="stat-label">довольных клиентов</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">5+</div>
-                            <div class="stat-label">сертификатов</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="about-image">
-                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3" alt="Семён Волкомуров - персональный тренер">
-                </div>
-            </div>
+    <section id="about" class="section">
+      <div class="container grid-2">
+        <div class="about-text card">
+          <h2>Обо мне</h2>
+          <p>Привет! Я сертифицированный персональный тренер с <strong>3-летним</strong> опытом работы. Специализируюсь на создании индивидуальных программ тренировок и питания для достижения ваших целей.</p>
+          <p>Окончил специализированную программу подготовки тренеров в спортивном клубе «Bright Fitness» и постоянно совершенствую знания, посещая международные семинары и курсы. Работаю по научно обоснованным методикам, с фокусом на технике, восстановлении и прогрессе.</p>
+          <ul class="stats">
+            <li><strong>3+</strong><span>года опыта</span></li>
+            <li><strong>100+</strong><span>довольных клиентов</span></li>
+            <li><strong>5+</strong><span>сертификатов</span></li>
+          </ul>
         </div>
+        <figure class="about-media card">
+          <img src="img/trainer.jpg" alt="Семён Волкомуров — персональный тренер" loading="lazy" decoding="async">
+        </figure>
+      </div>
     </section>
 
-    <!-- Услуги -->
-    <section id="services" class="services">
-        <div class="container">
-            <h2 class="section-title">Услуги и цены</h2>
-            
-            <div class="services-grid">
-                <div class="service-card" data-service="single" data-price="2150">
-                    <div class="service-icon">💪</div>
-                    <h3 class="service-title">Персональная тренировка</h3>
-                    <p>Индивидуальное занятие с полным сопровождением и коррекцией техники</p>
-                    <div class="service-price">2 150 ₽</div>
-                </div>
-                
-                <div class="service-card" data-service="package" data-price="10000">
-                    <div class="service-icon">📦</div>
-                    <h3 class="service-title">Пакет из 5 тренировок</h3>
-                    <p>Выгодный пакет для регулярных занятий с экономией 15%</p>
-                    <div class="service-price">10 000 ₽</div>
-                </div>
-                
-                <div class="service-card" data-service="plan" data-price="7000">
-                    <div class="service-icon">📝</div>
-                    <h3 class="service-title">Индивидуальный план</h3>
-                    <p>Программа тренировок и питания на месяц с онлайн-сопровождением</p>
-                    <div class="service-price">7 000 ₽</div>
-                </div>
-            </div>
-            
-            <!-- Форма оплаты -->
-            <div id="payment-form" class="payment-form">
-                <h3 class="form-title">Оплата тренировок</h3>
-                <form id="paymentForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="name">Имя и Фамилия</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Телефон</label>
-                            <input type="tel" id="phone" name="phone" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="service">Услуга</label>
-                            <select id="service" name="service" required>
-                                <option value="">Выберите услугу</option>
-                                <option value="single">Персональная тренировка (2 150 ₽)</option>
-                                <option value="package">Пакет из 5 тренировок (10 000 ₽)</option>
-                                <option value="plan">Индивидуальный план (7 000 ₽)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="amount">Сумма к оплате</label>
-                            <input type="text" id="amount" name="amount" readonly>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="payment-btn">Перейти к оплате</button>
-                </form>
-            </div>
+    <!-- Услуги и цены (контент сохранён) -->
+    <section id="services" class="section">
+      <div class="container">
+        <h2>Услуги и цены</h2>
+
+        <div class="services-grid">
+          <article class="service card">
+            <h3>Персональная тренировка</h3>
+            <p>Индивидуальное занятие с полным сопровождением и коррекцией техники</p>
+            <div class="price">2&nbsp;150&nbsp;₽</div>
+          </article>
+
+          <article class="service card">
+            <h3>Пакет из 5 тренировок</h3>
+            <p>Выгодный пакет для регулярных занятий с экономией 15%</p>
+            <div class="price">10&nbsp;000&nbsp;₽</div>
+          </article>
+
+          <article class="service card">
+            <h3>Индивидуальный план</h3>
+            <p>Программа тренировок и питания на месяц с онлайн-сопровождением</p>
+            <div class="price">7&nbsp;000&nbsp;₽</div>
+          </article>
         </div>
+      </div>
     </section>
 
     <!-- Контакты -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2 class="section-title">Контакты</h2>
-            
-            <div class="contact-grid">
-                <div class="contact-form">
-                    <h3>Отправить сообщение</h3>
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <label for="contact-name">Имя</label>
-                            <input type="text" id="contact-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="contact-phone">Телефон</label>
-                            <input type="tel" id="contact-phone" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Сообщение</label>
-                            <textarea id="message" rows="4" required></textarea>
-                        </div>
-                        <button type="submit" class="btn">Отправить</button>
-                    </form>
-                </div>
-                
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <div class="contact-icon">📍</div>
-                        <div class="contact-details">
-                            <h3>Адрес</h3>
-                            <p>г. Екатеринбург, ул. 8 марта, 46<br>Фитнес-клуб "Green Fitness"</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <div class="contact-icon">📱</div>
-                        <div class="contact-details">
-                            <h3>Телефон</h3>
-                            <p>+7 (995) 389-07-09</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <div class="contact-icon">🕒</div>
-                        <div class="contact-details">
-                            <h3>Часы работы</h3>
-                            <p>Ежедневно: 9:00 - 23:00</p>
-                        </div>
-                    </div>
-                    
-                    <div class="map-container">
-                        <div id="map"></div>
-                        <div class="map-overlay">
-                            <h3>Фитнес-клуб "Green Fitness"</h3>
-                            <p>г. Екатеринбург, ул. 8 марта, 46<br>Вход со стороны парковки</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <section id="contact" class="section">
+      <div class="container grid-2">
+        <div class="card">
+          <h2>Контакты</h2>
+
+          <div class="contact-block">
+            <h3 class="h4">Адрес</h3>
+            <p>г. Екатеринбург, ул. 8 марта, 46<br>Фитнес-клуб «Green Fitness»</p>
+
+            <h3 class="h4">Телефон</h3>
+            <p><a href="tel:+79953890709" class="link">+7&nbsp;(995)&nbsp;389-07-09</a></p>
+
+            <h3 class="h4">Часы работы</h3>
+            <p>Ежедневно: 9:00 — 23:00</p>
+          </div>
+
+          <div class="map-wrap">
+            <div id="map" class="map" role="img" aria-label="Карта проезда" data-lat="56.827" data-lng="60.597"></div>
+            <a id="map-fallback" class="map-fallback" href="https://maps.google.com/?q=Екатеринбург,+ул.+8+марта,+46" target="_blank" rel="noopener">Открыть карту</a>
+          </div>
         </div>
+
+        <div class="card">
+          <h2>Отправить сообщение</h2>
+          <form id="contact-form" novalidate>
+            <div class="field">
+              <label for="name">Имя</label>
+              <input id="name" name="name" type="text" autocomplete="name" required minlength="2" />
+              <span class="error" id="err-name" aria-live="polite"></span>
+            </div>
+
+            <div class="field">
+              <label for="phone">Телефон</label>
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required pattern="^[0-9+()\\s-]{5,}$" />
+              <span class="error" id="err-phone" aria-live="polite"></span>
+            </div>
+
+            <div class="field">
+              <label for="message">Сообщение</label>
+              <textarea id="message" name="message" rows="4" required minlength="5"></textarea>
+              <span class="error" id="err-message" aria-live="polite"></span>
+            </div>
+
+            <button type="submit" class="primary-btn">Отправить</button>
+            <div id="form-status" class="status" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
     </section>
 
-    <!-- Подвал -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-left">
-                    <div class="footer-logo">VolkomurovFit</div>
-                    <p class="legal">ИП Волкомуров Семён Сергеевич</p>
-                    <p class="legal">ИНН 667359740941</p>
-                </div>
-                
-                <div class="footer-right">
-                    <div class="social-links">
-                        <a href="#" class="social-link">VK</a>
-                        <a href="#" class="social-link">TG</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                &copy; 2025 Все права защищены. Любое копирование материалов запрещено.
-            </div>
+    <!-- Контейнер для будущих платежей -->
+    <section class="section">
+      <div class="container">
+        <div id="payment-container" class="card">
+          <!-- TODO: Интеграция платёжного шлюза Альфа-Банка (виджет/редирект) -->
+          <h2>Оплата</h2>
+          <p>Секция подготовлена к подключению платёжного решения Альфа-Банка. Кнопка «Оплата» в шапке прокручивает страницу к этому блоку.</p>
         </div>
-    </footer>
+      </div>
+    </section>
+  </main>
 
-    <!-- Подключаем JS -->
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=6dca7c55-faf3-42a1-abf8-c8af616e421e&lang=ru_RU"></script>
-    <script src="script.js"></script>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="legal">
+        <strong>VolkomurovFit</strong><br>
+        ИП Волкомуров Семён Сергеевич<br>
+        ИНН 667359740941
+      </div>
+      <div class="socials">
+        <a class="link" href="https://vk.com" target="_blank" rel="noopener">VK</a>
+        <a class="link" href="https://t.me" target="_blank" rel="noopener">TG</a>
+      </div>
+      <div class="copy">© 2025 Все права защищены.</div>
+    </div>
+  </footer>
+
+  <script src="scripts.js" defer></script>
 </body>
 </html>
