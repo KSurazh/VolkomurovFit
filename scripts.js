@@ -2,23 +2,22 @@
    Константы и плейсхолдеры
    =========================== */
 /**
- * 1) Телеграм:
- *    - Создайте бота у @BotFather и получите токен.
- *    - Узнайте свой chat_id (например, написав боту @userinfobot или добавив своего бота в приватный канал/чат и проверив updates).
- *    - Замените значения ниже:
+ * Telegram:
+ *  1) Создать бота у @BotFather и получить токен.
+ *  2) Узнать свой chat_id (бот @getmyid_bot или getUpdates).
+ *  3) Подставить значения ниже.
  */
 const TELEGRAM_BOT_TOKEN = 'ВАШ_TELEGRAM_BOT_TOKEN';
 const TELEGRAM_CHAT_ID   = 'ВАШ_CHAT_ID';
 
 /**
- * 2) Карта:
- *    Вариант: Яндекс.Карты JS API 2.1 (нужен API-ключ).
- *    Получите ключ и вставьте в переменную ниже. Если ключ не указан или загрузка скрипта не удалась — покажем статичную ссылку.
- *    Альтернатива: можно заменить на Google Maps JS API — логика загрузки аналогичная.
+ * Карта (Яндекс):
+ *  Получите API-ключ JS API 2.1 и подставьте ниже.
+ *  При отсутствии ключа/ошибке будет показан fallback-ссылкой.
  */
 const YANDEX_MAPS_API_KEY = '6dca7c55-faf3-42a1-abf8-c8af616e421e';
 
-/* Координаты клуба (примерно для ул. 8 марта, 46, Екатеринбург) */
+/* Координаты */
 const LOCATION = { lat: 56.829805, lng: 60.599889 };
 const MAP_LINK = 'https://maps.google.com/?q=Екатеринбург,+ул.+8+марта,+46';
 
@@ -29,54 +28,95 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
 /* ===========================
-   Мобильное меню (ARIA + scaleY)
+   Тема: системная + ручной переключатель
+   =========================== */
+(function theme(){
+  const root = document.documentElement;
+  const btn = $('#theme-toggle');
+  const storageKey = 'theme';
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+
+  const setMeta = (mode) => {
+    // синхронизируем цвет адресной строки
+    if (themeMeta) themeMeta.setAttribute('content', mode === 'dark' ? '#121212' : '#F8F9FA');
+  };
+  const apply = (mode) => {
+    root.setAttribute('data-theme', mode);
+    btn?.setAttribute('aria-pressed', String(mode === 'dark'));
+    btn && (btn.textContent = mode === 'dark' ? '☀️' : '🌙');
+    setMeta(mode);
+  };
+
+  // начальное состояние
+  const saved = localStorage.getItem(storageKey);
+  if (saved === 'dark' || saved === 'light') {
+    apply(saved);
+  } else {
+    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+    apply(prefersDark ? 'dark' : 'light');
+  }
+
+  // переключатель
+  btn?.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(storageKey, current);
+    apply(current);
+  });
+
+  // если пользователь не переопределял — реагируем на смену системной темы
+  const mq = window.matchMedia?.('(prefers-color-scheme: dark)');
+  mq?.addEventListener('change', (e) => {
+    if (!localStorage.getItem(storageKey)) {
+      apply(e.matches ? 'dark' : 'light');
+    }
+  });
+})();
+
+/* ===========================
+   Мобильное боковое меню (drawer)
    =========================== */
 (function mobileMenu(){
   const btn = $('#menu-toggle');
-  const nav = $('#nav-menu');
-  if (!btn || !nav) return;
-  btn.addEventListener('click', () => {
-    const opened = nav.classList.toggle('open');
-    btn.setAttribute('aria-expanded', String(opened));
-  });
-  // Закрываем меню по клику на ссылку
-  $$('.nav-link').forEach(a => a.addEventListener('click', () => {
-    if (nav.classList.contains('open')) {
-      nav.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
-    }
-  }));
-})();
+  const drawer = $('#mobile-drawer');
+  const backdrop = $('#drawer-backdrop');
 
-/* ===========================
-   Тёмная тема: системная + ручной переключатель
-   =========================== */
-(function theme(){
-  const btn = $('#theme-toggle');
-  const apply = (dark) => {
-    document.body.classList.toggle('dark', dark);
-    btn?.setAttribute('aria-pressed', String(dark));
+  const open = () => {
+    drawer.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
+    backdrop.hidden = false;
+    document.body.style.overflow = 'hidden';
+    btn.setAttribute('aria-expanded', 'true');
   };
-  // начальное состояние: сохранённое или системное
-  const saved = localStorage.getItem('darkMode');
-  if (saved === 'true' || (saved === null && window.matchMedia?.('(prefers-color-scheme: dark)').matches)) {
-    apply(true);
-  }
+  const close = () => {
+    drawer.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+    backdrop.hidden = true;
+    document.body.style.overflow = '';
+    btn.setAttribute('aria-expanded', 'false');
+  };
+
   btn?.addEventListener('click', () => {
-    const isDark = !document.body.classList.contains('dark');
-    apply(isDark);
-    localStorage.setItem('darkMode', String(isDark));
+    drawer.classList.contains('open') ? close() : open();
   });
+  backdrop?.addEventListener('click', close);
+  // закрытие по Esc
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  // клики по пунктам меню
+  $$('.drawer-link').forEach(a => a.addEventListener('click', close));
 })();
 
 /* ===========================
-   Плавный скролл к оплате
+   Кнопка «Оплата» в шапке -> прокрутка к кнопке после услуг
    =========================== */
 (function paymentScroll(){
-  const btn = $('#payment-button');
-  const target = $('#payment-container');
-  btn?.addEventListener('click', () => {
-    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const topBtn = $('#pay-top');
+  const anchor = $('#pay-anchor');
+  topBtn?.addEventListener('click', (e) => {
+    // если это ссылка-якорь, браузер сам прокрутит; на всякий случай:
+    if (anchor) {
+      e.preventDefault();
+      anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   });
 })();
 
@@ -119,10 +159,7 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
   const sendToTelegram = async (payloadText) => {
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-    const body = {
-      chat_id: TELEGRAM_CHAT_ID,
-      text: payloadText
-    };
+    const body = { chat_id: TELEGRAM_CHAT_ID, text: payloadText };
     const res = await fetch(url, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -162,13 +199,13 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
       console.error(err);
       statusBox.textContent = 'Ошибка отправки. Проверьте интернет или настройки Telegram.';
     }finally{
-      setTimeout(()=>{ statusBox.textContent=''; }, 5000); // авто-скрытие через 5 секунд
+      setTimeout(()=>{ statusBox.textContent=''; }, 5000);
     }
   });
 })();
 
 /* ===========================
-   Карта: Лениво загружаем Яндекс.Карты; если ошибка — fallback
+   Карта: лениво загружаем Яндекс.Карты, при ошибке — fallback
    =========================== */
 (function mapInit(){
   const mapEl = $('#map');
@@ -194,17 +231,16 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   });
 
   const initYandexMap = () => {
-    /* глобальный ymaps появится после загрузки скрипта */
     if (!window.ymaps) throw new Error('ymaps не найден');
     ymaps.ready(() => {
       const center = [Number(mapEl.dataset.lat) || LOCATION.lat, Number(mapEl.dataset.lng) || LOCATION.lng];
       const map = new ymaps.Map('map', { center, zoom: 16, controls: ['zoomControl'] });
       const placemark = new ymaps.Placemark(center, { balloonContent: 'Фитнес-клуб «Green Fitness»' }, { preset: 'islands#blueSportIcon' });
       map.geoObjects.add(placemark);
+      map.behaviors.disable('scrollZoom');
     });
   };
 
-  // Лениво загружаем карту при появлении в вьюпорте
   const io = new IntersectionObserver(async (entries) => {
     if (!entries.some(e => e.isIntersecting)) return;
     io.disconnect();
@@ -218,11 +254,3 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   }, { rootMargin: '200px' });
   io.observe(mapEl);
 })();
-
-/* ===========================
-   TODO: Платежи (Альфа-Банк)
-   ===========================
-   - На этапе интеграции добавьте виджет/редирект Альфа-Банка.
-   - Храните публичные ключи/идентификаторы в GitHub Secrets и подставляйте на сборке (или вручную в scripts.js).
-   - Кнопка #payment-button уже прокручивает страницу к #payment-container.
-*/
