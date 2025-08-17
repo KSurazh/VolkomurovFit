@@ -19,7 +19,7 @@ const TELEGRAM_CHAT_ID   = 'ВАШ_CHAT_ID';
 const YANDEX_MAPS_API_KEY = '6dca7c55-faf3-42a1-abf8-c8af616e421e';
 
 /* Координаты клуба (примерно для ул. 8 марта, 46, Екатеринбург) */
-const LOCATION = { lat: 56.827, lng: 60.597 };
+const LOCATION = { lat: 56.829805, lng: 60.599889 };
 const MAP_LINK = 'https://maps.google.com/?q=Екатеринбург,+ул.+8+марта,+46';
 
 /* ===========================
