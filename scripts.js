@@ -254,3 +254,23 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   }, { rootMargin: '200px' });
   io.observe(mapEl);
 })();
+
+// Маска ввода телефона
+const phoneInput = document.getElementById("phone");
+
+phoneInput.addEventListener("input", (e) => {
+  let value = e.target.value.replace(/\D/g, ""); // убираем всё, кроме цифр
+  if (!value.startsWith("79")) {
+    value = "79" + value.replace(/^7?9?/, ""); // всегда начинаем с 79
+  }
+
+  let formatted = "+7-";
+  if (value.length > 1) formatted += value.substring(1, 2); // 9
+  if (value.length >= 2) formatted += value.substring(2, 4);
+  if (value.length >= 4) formatted += "-" + value.substring(4, 7);
+  if (value.length >= 7) formatted += "-" + value.substring(7, 9);
+  if (value.length >= 9) formatted += "-" + value.substring(9, 11);
+
+  e.target.value = formatted;
+});
+
