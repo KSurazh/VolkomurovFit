@@ -7,8 +7,8 @@
  *  2) Узнать свой chat_id (бот @getmyid_bot или getUpdates).
  *  3) Подставить значения ниже.
  */
-const TELEGRAM_BOT_TOKEN = 'ВАШ_TELEGRAM_BOT_TOKEN';
-const TELEGRAM_CHAT_ID   = 'ВАШ_CHAT_ID';
+const TELEGRAM_BOT_TOKEN = '8264991850:AAFsRTvk2-YI005iLiuSS5MtS8Wc9sRsVsY';
+const TELEGRAM_CHAT_ID   = '-1004851383447';
 
 /**
  * Карта (Яндекс):
