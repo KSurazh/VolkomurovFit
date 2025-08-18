@@ -207,6 +207,21 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)
 .error{color:#b00020;min-height:1.2em;font-size:.9rem}
 .status{margin-top:10px;min-height:1.2em}
 
+/* Подсветка полей */
+input.invalid, textarea.invalid {
+  border: 2px solid red !important;
+}
+input.valid, textarea.valid {
+  border: 2px solid green !important;
+}
+
+/* Подсказки под полями */
+.tooltip {
+  font-size: 12px;
+  color: red;
+  margin-top: 4px;
+}
+
 /* ==========
    Footer
    ========== */
