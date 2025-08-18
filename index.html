@@ -136,23 +136,15 @@
         <div class="contact-card">
           <h2>Отправить сообщение</h2>
           <form id="contact-form" novalidate>
-            <div class="field">
-              <label for="name">Имя</label>
-              <input id="name" name="name" type="text" autocomplete="name" required minlength="2" />
-              <span class="error" id="err-name" aria-live="polite"></span>
-            </div>
+            <form id="contact-form">
+      <label for="name">Ваше имя</label>
+      <input type="text" id="name" name="name" placeholder="Например: Иван" required />
 
-            <div class="field">
-              <label for="phone">Телефон</label>
-              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required pattern="^[0-9+()\\s-]{5,}$" />
-              <span class="error" id="err-phone" aria-live="polite"></span>
-            </div>
+      <label for="phone">Телефон</label>
+      <input type="tel" id="phone" name="phone" placeholder="+7-9XX-XXX-XX-XX" required />
 
-            <div class="field">
-              <label for="message">Сообщение</label>
-              <textarea id="message" name="message" rows="4" required minlength="5"></textarea>
-              <span class="error" id="err-message" aria-live="polite"></span>
-            </div>
+      <label for="message">Сообщение</label>
+      <textarea id="message" name="message" placeholder="Например: Хочу тренироваться 3 раза в неделю" required></textarea>
 
             <button type="submit" class="primary-btn">Отправить</button>
             <div id="form-status" class="status" role="status" aria-live="polite"></div>
@@ -168,10 +160,6 @@
         <strong>VolkomurovFit</strong><br>
         ИП Волкомуров Семён Сергеевич<br>
         ИНН 667359740941
-      </div>
-      <div class="socials">
-        <a class="link" href="https://vk.com" target="_blank" rel="noopener">VK</a>
-        <a class="link" href="https://t.me" target="_blank" rel="noopener">TG</a>
       </div>
       <div class="copy">© 2025 Все права защищены.</div>
     </div>
