@@ -137,45 +137,30 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
     }
   }
 
-  // Маска телефона
-  phoneInput.addEventListener('input', (e) => {
-    let v = e.target.value.replace(/\D/g, ''); // только цифры
-    if (v.startsWith('8')) v = v.substring(1); // убираем 8
-    if (!v.startsWith('7')) v = '7' + v; // всегда начинается с 7
-    e.target.value = '+' + v;
-    validateField(phoneInput, phoneInput.value.length >= 12, "Введите корректный номер");
-  });
+ // Маска телефона
+phoneInput.addEventListener('input', (e) => {
+  let v = e.target.value.replace(/\D/g, ''); // только цифры
+  if (v.startsWith('8')) v = v.substring(1); // убираем 8
+  if (!v.startsWith('7')) v = '7' + v; // всегда начинается с 7
+  v = v.substring(0, 11); // максимум 11 цифр (7 + 10)
+  e.target.value = '+' + v;
+  validatePhone();
+});
 
-  nameInput.addEventListener('input', () => {
-    validateField(nameInput, nameInput.value.trim().length > 1, "Имя должно содержать минимум 2 символа");
-  });
+// Валидация телефона
+function validatePhone() {
+  const regex = /^\+7\d{10}$/; // строго +7 и 10 цифр
+  const valid = regex.test(phoneInput.value);
+  return validateField(phoneInput, valid, "Введите номер в формате +79001112233");
+}
 
-  msgInput.addEventListener('input', () => {
-    validateField(msgInput, msgInput.value.trim().length > 0, "Поле не должно быть пустым");
-  });
-
-  // Валидация отдельного поля
-  function validateField(field, condition, errorMsg) {
-    if (condition) {
-      field.classList.add('valid');
-      field.classList.remove('invalid');
-      setTooltip(field, "");
-      return true;
-    } else {
-      field.classList.add('invalid');
-      field.classList.remove('valid');
-      setTooltip(field, errorMsg);
-      return false;
-    }
-  }
-
-  // Проверка всех полей
-  function validateForm() {
-    const validName = validateField(nameInput, nameInput.value.trim().length > 1, "Имя должно содержать минимум 2 символа");
-    const validPhone = validateField(phoneInput, phoneInput.value.length >= 12, "Введите корректный номер");
-    const validMsg = validateField(msgInput, msgInput.value.trim().length > 0, "Поле не должно быть пустым");
-    return validName && validPhone && validMsg;
-  }
+// Проверка всех полей
+function validateForm() {
+  const validName = validateField(nameInput, nameInput.value.trim().length > 1, "Имя должно содержать минимум 2 символа");
+  const validPhone = validatePhone();
+  const validMsg = validateField(msgInput, msgInput.value.trim().length > 0, "Поле не должно быть пустым");
+  return validName && validPhone && validMsg;
+}
 
   // Отправка формы
   form.addEventListener('submit', async (e) => {
