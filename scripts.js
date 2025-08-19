@@ -67,7 +67,7 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
    =========================== */
 (function menu(){
   const btn = $('#menu-toggle');
-  const nav = $('#mobile-nav');
+  const nav = $('#mobile-drawer');
 
   if (!btn || !nav) return;
 
@@ -77,7 +77,7 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
     nav.classList.toggle('open', !expanded);
   });
 
-  $$('#mobile-nav a').forEach(link => link.addEventListener('click', () => {
+  $$('#mobile-drawer a').forEach(link => link.addEventListener('click', () => {
     nav.classList.remove('open');
     btn.setAttribute('aria-expanded', 'false');
   }));
@@ -119,9 +119,8 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const nameInput = $('#name');
   const phoneInput = $('#phone');
   const msgInput = $('#message');
-  const statusBox = document.createElement('div');
-  statusBox.id = 'form-status';
-  form.appendChild(statusBox);
+  let statusBox = document.getElementById('form-status');
+if (!statusBox) { statusBox = document.createElement('div'); statusBox.id = 'form-status'; form.appendChild(statusBox); }
 
   // Создание подсказки
   function setTooltip(field, message) {
@@ -148,8 +147,19 @@ phoneInput.addEventListener('input', (e) => {
 });
 
 // Валидация телефона
-function validatePhone() {
-  const regex = /^\+7\d{10}$/; // строго +7 и 10 цифр
+function validatePhone(){
+  const v = phoneInput.value.trim();
+  const ok = /^\+7\d{10}$/.test(v);
+  if (!ok) {
+    setTooltip(phoneInput, "Введите номер в формате +79001112233");
+    phoneInput.setAttribute('aria-invalid','true');
+  } else {
+    setTooltip(phoneInput, "");
+    phoneInput.removeAttribute('aria-invalid');
+  }
+  return ok;
+}
+$/; // строго +7 и 10 цифр
   const valid = regex.test(phoneInput.value);
   return validateField(phoneInput, valid, "Введите номер в формате +79001112233");
 }
@@ -164,6 +174,12 @@ function validateForm() {
 
   // Отправка формы
   form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"], .form-submit, #submit-btn') || form.querySelector('button');
+            if (window.__formAbortController) { try{ window.__formAbortController.abort(); } catch(e){} }
+            window.__formAbortController = new AbortController();
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.setAttribute('aria-busy','true'); submitBtn.dataset._label = submitBtn.textContent; submitBtn.textContent = 'Отправляем...'; }
+
     e.preventDefault();
 
     // 🔥 Сразу подсвечиваем все ошибки, даже если юзер не трогал поля
@@ -180,7 +196,7 @@ function validateForm() {
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
     try {
-      const res = await fetch(url, {
+      const res = await fetch(url, { signal: (window.__formAbortController ? window.__formAbortController.signal : undefined),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -200,10 +216,12 @@ function validateForm() {
       } else {
         throw new Error('Ошибка при отправке');
       }
-    } catch (err) {
+    }
+catch(err){
       console.error(err);
       showStatus('❌ Не удалось отправить. Попробуйте ещё раз.', true);
     }
+finally{ const submitBtn = form.querySelector('button[type=\"submit\"], .form-submit, #submit-btn') || form.querySelector('button'); if (submitBtn){ submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (submitBtn.dataset._label) submitBtn.textContent = submitBtn.dataset._label; } window.__formAbortController = null; }
   });
 
   function showStatus(msg, error = false) {
@@ -215,4 +233,15 @@ function validateForm() {
 
   // Начальное значение телефона
   if (!phoneInput.value) phoneInput.value = '+7';
+})();
+
+;(function ensureYandexMap(){
+  if (window.ymaps) return;
+  try {
+    var s = document.createElement('script');
+    s.src = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=' + (typeof YANDEX_MAPS_API_KEY!=='undefined' ? YANDEX_MAPS_API_KEY : '');
+    s.async = true;
+    s.onerror = function(){ console.warn('Yandex Maps failed to load; showing fallback'); };
+    document.head.appendChild(s);
+  } catch(e){ console.warn('Unable to inject Yandex Maps script', e); }
 })();
