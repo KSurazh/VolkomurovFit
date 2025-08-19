@@ -61,29 +61,26 @@ function showInlineStatus(box, msg, type = "info", timeoutMs = 5000) {
   }
 }
 
-/* ====== ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ ====== */
-document.addEventListener("DOMContentLoaded", () => {
-    const themeToggleBtn = document.getElementById("theme-toggle");
+/* ===========================
+   Тема: системная + ручной переключатель
+   =========================== */
+(function theme(){
+  const root = document.documentElement;
+  const btn = $('#theme-toggle');
+  const storageKey = 'theme';
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
 
-    // При загрузке страницы проверяем сохранённую тему
-    if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark-theme");
-    }
+  const setMeta = (mode) => {
+    // синхронизируем цвет адресной строки
+    if (themeMeta) themeMeta.setAttribute('content', mode === 'dark' ? '#121212' : '#F8F9FA');
+  };
+  const apply = (mode) => {
+    root.setAttribute('data-theme', mode);
+    btn?.setAttribute('aria-pressed', String(mode === 'dark'));
+    btn && (btn.textContent = mode === 'dark' ? '☀️' : '🌙');
+    setMeta(mode);
+  };
 
-    // Обработчик переключения
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener("click", () => {
-            document.body.classList.toggle("dark-theme");
-            
-            // Сохраняем текущее состояние
-            if (document.body.classList.contains("dark-theme")) {
-                localStorage.setItem("theme", "dark");
-            } else {
-                localStorage.setItem("theme", "light");
-            }
-        });
-    }
-});
 
   // первичная инициализация
   apply(getMode());
