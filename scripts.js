@@ -61,26 +61,79 @@ function showInlineStatus(box, msg, type = "info", timeoutMs = 5000) {
   }
 }
 
-/* ===========================
-   Тема: системная + ручной переключатель
-   =========================== */
-(function theme(){
-  const root = document.documentElement;
-  const btn = $('#theme-toggle');
-  const storageKey = 'theme';
-  const themeMeta = document.querySelector('meta[name="theme-color"]');
+/* ====== ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ ====== */
+// Работает с CSS: [data-theme="dark"] { ... }
+// Режимы: auto → dark → light → auto. Сохраняется в localStorage.
+(() => {
+  const BTN_SELECTORS = "#theme-toggle, #themeToggle, [data-role='theme-toggle']";
+  const STORAGE_KEY = "theme-mode"; // значения: 'auto' | 'dark' | 'light'
+  const mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
-  const setMeta = (mode) => {
-    // синхронизируем цвет адресной строки
-    if (themeMeta) themeMeta.setAttribute('content', mode === 'dark' ? '#121212' : '#F8F9FA');
-  };
+  const btn = document.querySelector(BTN_SELECTORS);
+
+  const getMode = () => localStorage.getItem(STORAGE_KEY) || "auto";
+  const isSysDark = () => (mq ? mq.matches : false);
+
   const apply = (mode) => {
-    root.setAttribute('data-theme', mode);
-    btn?.setAttribute('aria-pressed', String(mode === 'dark'));
-    btn && (btn.textContent = mode === 'dark' ? '☀️' : '🌙');
-    setMeta(mode);
+    const html = document.documentElement;
+    const useDark = mode === "dark" || (mode === "auto" && isSysDark());
+
+    // Ключевая строка: ставим/убираем data-theme="dark" на <html>
+    if (useDark) {
+      html.setAttribute("data-theme", "dark");
+    } else {
+      html.removeAttribute("data-theme");
+    }
+
+    // Обновляем мета-цвет для мобильных браузеров (не обязательно)
+    const meta = document.querySelector('meta[name="theme-color"]') || (() => {
+      const m = document.createElement("meta");
+      m.setAttribute("name", "theme-color");
+      document.head.appendChild(m);
+      return m;
+    })();
+    meta.setAttribute("content", useDark ? "#121212" : "#ffffff");
+
+    // Обновляем текст/иконку кнопки (если есть)
+    if (btn) {
+      const label = mode === "auto" ? "🌓" : useDark ? "🌙" : "☀️";
+      btn.textContent = label;
+      btn.setAttribute("aria-label", `Тема: ${mode}`);
+      btn.setAttribute("aria-pressed", String(useDark));
+    }
   };
 
+  const setMode = (mode) => {
+    localStorage.setItem(STORAGE_KEY, mode);
+    apply(mode);
+  };
+
+  // Инициализация при загрузке
+  const init = () => apply(getMode());
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+
+  // Переключатель: auto -> dark -> light -> auto
+  if (btn) {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const cur = getMode();
+      const next = cur === "auto" ? "dark" : cur === "dark" ? "light" : "auto";
+      setMode(next);
+    });
+  }
+
+  // Следим за системной темой, если режим — auto
+  if (mq) {
+    mq.addEventListener
+      ? mq.addEventListener("change", () => { if (getMode() === "auto") apply("auto"); })
+      : mq.addListener && mq.addListener(() => { if (getMode() === "auto") apply("auto"); });
+  }
+})();
 
   // первичная инициализация
   apply(getMode());
