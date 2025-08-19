@@ -38,19 +38,25 @@ function showInlineStatus(box, msg, type = "info", timeoutMs = 5000) {
 }
 
 /* ===========================
-   БУРГЕР-МЕНЮ
-=========================== */
-document.addEventListener("DOMContentLoaded", function () {
-  const burger = document.querySelector(".burger");
-  const nav = document.querySelector(".nav-links");
+   Мобильное меню
+   =========================== */
+(function menu(){
+  const btn = $('#menu-toggle');
+  const nav = $('#mobile-drawer');
 
-  if (burger && nav) {
-    burger.addEventListener("click", function () {
-      nav.classList.toggle("active");
-      burger.classList.toggle("toggle");
-    });
-  }
-});
+  if (!btn || !nav) return;
+
+  btn.addEventListener('click', () => {
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    nav.classList.toggle('open', !expanded);
+  });
+
+  $$('#mobile-drawer a').forEach(link => link.addEventListener('click', () => {
+    nav.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  }));
+})();
 
 /* ===========================
    ОТПРАВКА ФОРМЫ В TELEGRAM
