@@ -1,247 +1,336 @@
-/* ===========================
-   Константы и плейсхолдеры
-   =========================== */
-/**
- * Telegram:
- *  1) Создать бота у @BotFather и получить токен.
- *  2) Узнать свой chat_id (бот @getmyid_bot или getUpdates).
- *  3) Подставить значения ниже.
- */
-const TELEGRAM_BOT_TOKEN = '8264991850:AAFsRTvk2-YI005iLiuSS5MtS8Wc9sRsVsY';
-const TELEGRAM_CHAT_ID   = '-1004851383447';
+/* =========================================================
+   VolkomurovFit — клиентские скрипты
+   - Бургер-меню (mobile)
+   - Переключатель темы (auto/dark/light)
+   - Контактная форма (Telegram)
+   - Загрузка и инициализация Яндекс.Карт
+   ---------------------------------------------------------
+   Ключи/ID:
+   1) Глобальные (если объявлены где-то на странице):
+      window.TELEGRAM_BOT_TOKEN, window.TELEGRAM_CHAT_ID, window.YANDEX_MAPS_API_KEY
+   2) Иначе — константы ниже (замените плейсхолдеры).
+   ========================================================= */
 
-/**
- * Карта (Яндекс):
- *  Получите API-ключ JS API 2.1 и подставьте ниже.
- *  При отсутствии ключа/ошибке будет показан fallback-ссылкой.
- */
-const YANDEX_MAPS_API_KEY = '6dca7c55-faf3-42a1-abf8-c8af616e421e';
+/* ====== КОНФИГ (замените значения на свои при необходимости) ====== */
+const TELEGRAM_BOT_TOKEN_FALLBACK = "8264991850:AAFsRTvk2-YI005iLiuSS5MtS8Wc9sRsVsY";
+const TELEGRAM_CHAT_ID_FALLBACK   = "-1004851383447";
+const YANDEX_MAPS_API_KEY_FALLBACK = "6dca7c55-faf3-42a1-abf8-c8af616e421e";
 
-/* Координаты */
-const LOCATION = { lat: 56.829805, lng: 60.599889 };
-const MAP_LINK = 'https://maps.google.com/?q=Екатеринбург,+ул.+8+марта,+46';
+/* ====== ГЕТТЕРЫ КОНФИГА (сначала берём глобальные, потом фолбэки) ====== */
+function getTelegramBotToken() {
+  return (typeof window.TELEGRAM_BOT_TOKEN !== "undefined" && window.TELEGRAM_BOT_TOKEN) ?
+    window.TELEGRAM_BOT_TOKEN : TELEGRAM_BOT_TOKEN_FALLBACK;
+}
+function getTelegramChatId() {
+  return (typeof window.TELEGRAM_CHAT_ID !== "undefined" && window.TELEGRAM_CHAT_ID) ?
+    window.TELEGRAM_CHAT_ID : TELEGRAM_CHAT_ID_FALLBACK;
+}
+function getYandexApiKey() {
+  return (typeof window.YANDEX_MAPS_API_KEY !== "undefined" && window.YANDEX_MAPS_API_KEY) ?
+    window.YANDEX_MAPS_API_KEY : YANDEX_MAPS_API_KEY_FALLBACK;
+}
 
-/* ===========================
-   Утилиты
-   =========================== */
-const $ = (sel, root = document) => root.querySelector(sel);
+/* ====== УТИЛИТЫ ====== */
+const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
 
-/* ===========================
-   Тема: системная + ручной переключатель
-   =========================== */
-(function theme(){
-  const root = document.documentElement;
-  const btn = $('#theme-toggle');
-  const storageKey = 'theme';
-  const themeMeta = document.querySelector('meta[name="theme-color"]');
+function updateMetaThemeColor(hex) {
+  let m = document.querySelector('meta[name="theme-color"]');
+  if (!m) {
+    m = document.createElement("meta");
+    m.setAttribute("name", "theme-color");
+    document.head.appendChild(m);
+  }
+  m.setAttribute("content", hex);
+}
 
-  const setMeta = (mode) => {
-    if (themeMeta) themeMeta.setAttribute('content', mode === 'dark' ? '#121212' : '#F8F9FA');
-  };
+function showInlineStatus(box, msg, type = "info", timeoutMs = 5000) {
+  if (!box) return;
+  box.textContent = msg || "";
+  box.classList.remove("error", "success", "info");
+  box.classList.add(type);
+  box.style.display = msg ? "block" : "none";
+  box.setAttribute("role", "alert");
+  if (timeoutMs > 0 && msg) {
+    window.clearTimeout(box.__hideTimer);
+    box.__hideTimer = window.setTimeout(() => {
+      box.style.display = "none";
+      box.textContent = "";
+    }, timeoutMs);
+  }
+}
+
+/* ====== ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ ====== */
+(function initTheme() {
+  const btn = $("#themeToggle, #theme-toggle, [data-role='theme-toggle']");
+  const KEY = "theme-mode"; // 'auto' | 'dark' | 'light'
+  const mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+  const getMode = () => localStorage.getItem(KEY) || "auto";
+  const sysDark = () => (mq ? mq.matches : false);
+
   const apply = (mode) => {
-    root.setAttribute('data-theme', mode);
-    btn?.setAttribute('aria-pressed', String(mode === 'dark'));
-    btn && (btn.textContent = mode === 'dark' ? '☀️' : '🌙');
-    setMeta(mode);
+    const useDark = mode === "dark" || (mode === "auto" && sysDark());
+
+    document.documentElement.classList.toggle("dark", useDark);
+    document.body.classList.toggle("dark", useDark);
+    document.documentElement.classList.toggle("theme-dark", useDark);
+    document.documentElement.classList.toggle("theme-light", !useDark);
+
+    updateMetaThemeColor(useDark ? "#0f0f10" : "#ffffff");
+
+    if (btn) {
+      const label = mode === "auto" ? "🌓" : useDark ? "🌙" : "☀️";
+      btn.setAttribute("aria-label", `Тема: ${mode}`);
+      btn.textContent = label;
+    }
   };
 
-  const saved = localStorage.getItem(storageKey);
-  if (saved === 'dark' || saved === 'light') {
-    apply(saved);
-  } else {
-    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-    apply(prefersDark ? 'dark' : 'light');
-  }
+  const setMode = (mode) => {
+    localStorage.setItem(KEY, mode);
+    apply(mode);
+  };
 
-  btn?.addEventListener('click', () => {
-    const current = root.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    localStorage.setItem(storageKey, next);
-    apply(next);
-  });
-})();
+  // первичная инициализация
+  apply(getMode());
 
-/* ===========================
-   Мобильное меню
-   =========================== */
-(function menu(){
-  const btn = $('#menu-toggle');
-  const nav = $('#mobile-drawer');
-
-  if (!btn || !nav) return;
-
-  btn.addEventListener('click', () => {
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!expanded));
-    nav.classList.toggle('open', !expanded);
+  // клик по переключателю
+  on(btn, "click", (e) => {
+    e.preventDefault();
+    const cur = getMode();
+    const next = cur === "auto" ? "dark" : cur === "dark" ? "light" : "auto";
+    setMode(next);
   });
 
-  $$('#mobile-drawer a').forEach(link => link.addEventListener('click', () => {
-    nav.classList.remove('open');
-    btn.setAttribute('aria-expanded', 'false');
-  }));
-})();
-
-/* ===========================
-   Карта
-   =========================== */
-(function map(){
-  const container = $('#map');
-  if (!container) return;
-
-  if (typeof ymaps === 'undefined') {
-    container.innerHTML = `<a href="${MAP_LINK}" target="_blank" rel="noopener">
-      <img src="https://static-maps.yandex.ru/1.x/?ll=${LOCATION.lng},${LOCATION.lat}&size=450,300&z=16&l=map&pt=${LOCATION.lng},${LOCATION.lat},pm2rdm"
-           alt="Открыть карту" loading="lazy" style="max-width:100%;border-radius:12px;">
-    </a>`;
-    return;
-  }
-
-  ymaps.ready(() => {
-    const map = new ymaps.Map('map', {
-      center: [LOCATION.lat, LOCATION.lng],
-      zoom: 16,
-      controls: ['zoomControl']
+  // реакция на изменение системной темы, если режим — auto
+  if (mq) {
+    on(mq, "change", () => {
+      if (getMode() === "auto") apply("auto");
     });
-    const placemark = new ymaps.Placemark([LOCATION.lat, LOCATION.lng], { balloonContent: 'Тренер здесь' });
-    map.geoObjects.add(placemark);
+  }
+})();
+
+/* ====== БУРГЕР-МЕНЮ (мобилка) ====== */
+(function initBurger() {
+  const burger = $("#burger, .burger, [data-role='burger']");
+  const drawer = $("#mobile-drawer, #mobile-nav, .nav-mobile, [data-role='mobile-drawer']");
+  const links = $$("#mobile-drawer a, #mobile-nav a, .nav-mobile a, [data-role='mobile-drawer'] a");
+
+  const toggle = (force) => {
+    if (!drawer) return;
+    const willOpen = typeof force === "boolean" ? force : !drawer.classList.contains("open") && !drawer.classList.contains("active");
+    drawer.classList.toggle("open", willOpen);
+    drawer.classList.toggle("active", willOpen); // на случай, если стили завязаны на .active
+    document.body.classList.toggle("no-scroll", willOpen);
+    if (burger) burger.setAttribute("aria-expanded", String(willOpen));
+  };
+
+  on(burger, "click", (e) => {
+    e.preventDefault();
+    toggle();
+  });
+
+  links.forEach((a) => on(a, "click", () => toggle(false)));
+
+  on(document, "keydown", (e) => {
+    if (e.key === "Escape") toggle(false);
   });
 })();
 
-/* ===========================
-   Форма: Telegram + маска телефона + подсветка + tooltip
-   =========================== */
-(function form(){
-  const form = $('#contact-form');
+/* ====== КОНТАКТНАЯ ФОРМА (Telegram) ====== */
+(function initContactForm() {
+  const form =
+    $("#contactForm, #contact-form, form[data-role='contact'], form.contact-form") ||
+    $("section#contacts form") ||
+    $("form[action*='telegram']");
+
   if (!form) return;
 
-  const nameInput = $('#name');
-  const phoneInput = $('#phone');
-  const msgInput = $('#message');
-  let statusBox = document.getElementById('form-status');
-if (!statusBox) { statusBox = document.createElement('div'); statusBox.id = 'form-status'; form.appendChild(statusBox); }
-
-  // Создание подсказки
-  function setTooltip(field, message) {
-    let tooltip = field.parentNode.querySelector('.tooltip');
-    if (!tooltip && message) {
-      tooltip = document.createElement('div');
-      tooltip.className = 'tooltip';
-      field.parentNode.appendChild(tooltip);
-    }
-    if (tooltip) {
-      tooltip.textContent = message || '';
-      tooltip.style.display = message ? 'block' : 'none';
-    }
+  const nameInput    = $("#name, input[name='name'], input[data-name='name']", form) || $("input[type='text']", form);
+  const phoneInput   = $("#phone, input[name='phone'], input[type='tel']", form);
+  const messageInput = $("#message, textarea[name='message'], textarea[data-name='message']", form) || $("textarea", form);
+  let statusBox      = $("#form-status, .form-status, .response", form);
+  if (!statusBox) {
+    statusBox = document.createElement("div");
+    statusBox.id = "form-status";
+    statusBox.style.display = "none";
+    statusBox.style.marginTop = "8px";
+    form.appendChild(statusBox);
   }
 
- // Маска телефона
-phoneInput.addEventListener('input', (e) => {
-  let v = e.target.value.replace(/\D/g, ''); // только цифры
-  if (v.startsWith('8')) v = v.substring(1); // убираем 8
-  if (!v.startsWith('7')) v = '7' + v; // всегда начинается с 7
-  v = v.substring(0, 11); // максимум 11 цифр (7 + 10)
-  e.target.value = '+' + v;
-  validatePhone();
-});
+  // Мягкая нормализация телефона при вводе:
+  // - всегда принудительно префикс +7
+  // - если начали с 8 — превращаем в +7
+  // - только цифры, максимум 11 (7 + 10 цифр)
+  if (phoneInput) {
+    on(phoneInput, "input", () => {
+      let digits = phoneInput.value.replace(/\D/g, "");
+      if (digits.startsWith("8")) digits = "7" + digits.slice(1);
+      if (!digits.startsWith("7")) digits = "7" + digits;
+      digits = digits.slice(0, 11);
+      phoneInput.value = "+" + digits;
+    });
 
-// Валидация телефона
-function validatePhone(){
-  const v = phoneInput.value.trim();
-  const ok = /^\+7\d{10}$/.test(v);
-  if (!ok) {
-    setTooltip(phoneInput, "Введите номер в формате +79001112233");
-    phoneInput.setAttribute('aria-invalid','true');
-  } else {
-    setTooltip(phoneInput, "");
-    phoneInput.removeAttribute('aria-invalid');
+    // При фокусе, если поле пустое — подставить +7
+    on(phoneInput, "focus", () => {
+      const v = (phoneInput.value || "").trim();
+      if (!v) phoneInput.value = "+7";
+    });
   }
-  return ok;
-}
-$/; // строго +7 и 10 цифр
-  const valid = regex.test(phoneInput.value);
-  return validateField(phoneInput, valid, "Введите номер в формате +79001112233");
-}
 
-// Проверка всех полей
-function validateForm() {
-  const validName = validateField(nameInput, nameInput.value.trim().length > 1, "Имя должно содержать минимум 2 символа");
-  const validPhone = validatePhone();
-  const validMsg = validateField(msgInput, msgInput.value.trim().length > 0, "Поле не должно быть пустым");
-  return validName && validPhone && validMsg;
-}
+  const isPhoneValid = () => {
+    const v = (phoneInput?.value || "").trim();
+    return /^\+7\d{10}$/.test(v);
+  };
 
-  // Отправка формы
-  form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = form.querySelector('button[type="submit"], .form-submit, #submit-btn') || form.querySelector('button');
-            if (window.__formAbortController) { try{ window.__formAbortController.abort(); } catch(e){} }
-            window.__formAbortController = new AbortController();
-            if (submitBtn) { submitBtn.disabled = true; submitBtn.setAttribute('aria-busy','true'); submitBtn.dataset._label = submitBtn.textContent; submitBtn.textContent = 'Отправляем...'; }
+  let controller = null;
 
-    e.preventDefault();
+  on(form, "submit", async (e) => {
+    e.preventDefault(); // критично: не прыгать в начало страницы
 
-    // 🔥 Сразу подсвечиваем все ошибки, даже если юзер не трогал поля
-    if (!validateForm()) {
-      showStatus('❌ Пожалуйста, заполните корректно все поля.', true);
+    const submitBtn = $("button[type='submit'], .form-submit, #submit-btn, button", form);
+
+    const name = (nameInput?.value || "").trim();
+    const phone = (phoneInput?.value || "").trim();
+    const msg = (messageInput?.value || "").trim();
+
+    // Валидации
+    if (!isPhoneValid()) {
+      showInlineStatus(statusBox, "Введите корректный номер телефона в формате +7XXXXXXXXXX", "error");
+      phoneInput?.focus();
+      return;
+    }
+    if (!name) {
+      showInlineStatus(statusBox, "Пожалуйста, укажите ваше имя", "error");
+      nameInput?.focus();
+      return;
+    }
+    if (!msg) {
+      showInlineStatus(statusBox, "Напишите, пожалуйста, сообщение", "error");
+      messageInput?.focus();
       return;
     }
 
-    const name = nameInput.value.trim();
-    const phone = phoneInput.value.trim();
-    const message = msgInput.value.trim();
+    // Токен/чат — из формы (data-*) или глобала, или фолбэка
+    const token  = form.getAttribute("data-bot-token") || getTelegramBotToken();
+    const chatId = form.getAttribute("data-chat-id")  || getTelegramChatId();
 
-    const text = `📩 Новая заявка:\nИмя: ${name}\nТелефон: ${phone}\nСообщение: ${message}`;
-    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    if (!token || token.includes("PASTE_YOUR_TELEGRAM_BOT_TOKEN_HERE") || !chatId || chatId.includes("PASTE_YOUR_TELEGRAM_CHAT_ID_HERE")) {
+      showInlineStatus(statusBox, "Не задан токен бота или chat_id. Проверьте настройки ключей.", "error");
+      return;
+    }
+
+    const text =
+      `📩 Заявка с сайта\n` +
+      `👤 Имя: ${name}\n` +
+      `📱 Телефон: ${phone}\n` +
+      `✉️ Сообщение: ${msg}`;
+
+    // Блокировка кнопки
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute("aria-busy", "true");
+      if (!submitBtn.dataset._label) submitBtn.dataset._label = submitBtn.textContent;
+      submitBtn.textContent = "Отправляем...";
+    }
+
+    // Отмена предыдущего запроса при повторной отправке
+    if (controller) { try { controller.abort(); } catch(_){} }
+    controller = new AbortController();
 
     try {
-      const res = await fetch(url, { signal: (window.__formAbortController ? window.__formAbortController.signal : undefined),
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: text
-        })
+      const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text }),
+        signal: controller.signal
       });
 
-      if (res.ok) {
-        showStatus('✅ Заявка успешно отправлена!');
-        form.reset();
-        phoneInput.value = '+7'; // сброс к начальному виду
-        [nameInput, phoneInput, msgInput].forEach(f => {
-          f.classList.remove('valid', 'invalid');
-          setTooltip(f, "");
-        });
-      } else {
-        throw new Error('Ошибка при отправке');
+      if (!res.ok) {
+        const t = await res.text().catch(() => "");
+        throw new Error(`Telegram API error: ${res.status} ${t}`);
       }
+
+      showInlineStatus(statusBox, "Сообщение успешно отправлено! Я свяжусь с вами в ближайшее время.", "success");
+      form.reset();
+      if (phoneInput) phoneInput.value = "+7";
+    } catch (err) {
+      if (err && err.name === "AbortError") {
+        showInlineStatus(statusBox, "Предыдущая отправка отменена. Повторите ещё раз.", "error");
+      } else {
+        console.error("[ContactForm] send error:", err);
+        showInlineStatus(statusBox, "Ошибка при отправке. Проверьте интернет и попробуйте снова.", "error");
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute("aria-busy");
+        if (submitBtn.dataset._label) submitBtn.textContent = submitBtn.dataset._label;
+      }
+      controller = null;
     }
-catch(err){
-      console.error(err);
-      showStatus('❌ Не удалось отправить. Попробуйте ещё раз.', true);
-    }
-finally{ const submitBtn = form.querySelector('button[type=\"submit\"], .form-submit, #submit-btn') || form.querySelector('button'); if (submitBtn){ submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); if (submitBtn.dataset._label) submitBtn.textContent = submitBtn.dataset._label; } window.__formAbortController = null; }
   });
-
-  function showStatus(msg, error = false) {
-    statusBox.textContent = msg;
-    statusBox.style.color = error ? 'red' : 'green';
-    statusBox.style.marginTop = '10px';
-    setTimeout(() => { statusBox.textContent = ''; }, 5000);
-  }
-
-  // Начальное значение телефона
-  if (!phoneInput.value) phoneInput.value = '+7';
 })();
 
-;(function ensureYandexMap(){
-  if (window.ymaps) return;
-  try {
-    var s = document.createElement('script');
-    s.src = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=' + (typeof YANDEX_MAPS_API_KEY!=='undefined' ? YANDEX_MAPS_API_KEY : '');
-    s.async = true;
-    s.onerror = function(){ console.warn('Yandex Maps failed to load; showing fallback'); };
-    document.head.appendChild(s);
-  } catch(e){ console.warn('Unable to inject Yandex Maps script', e); }
+/* ====== ЯНДЕКС.КАРТЫ ====== */
+(function initYandexMap() {
+  // Если на странице нет контейнера карты — выходим тихо
+  const mapEl =
+    $("#map, #yandex-map, .yandex-map, [data-role='map']") ||
+    document.getElementById("map");
+  if (!mapEl) return;
+
+  // Если скрипт уже подключён — ничего не делаем
+  if ([...document.scripts].some((s) => s.src && s.src.includes("api-maps.yandex.ru/2.1"))) {
+    // Когда готово — проинициализируем
+    if (window.ymaps && window.ymaps.ready) {
+      window.ymaps.ready(initMapInstance);
+    } else {
+      // на всякий случай подождём
+      const t = setInterval(() => {
+        if (window.ymaps && window.ymaps.ready) {
+          clearInterval(t);
+          window.ymaps.ready(initMapInstance);
+        }
+      }, 200);
+    }
+    return;
+  }
+
+  // Иначе — подключаем скрипт с ключом
+  const KEY = getYandexApiKey();
+  const src = `https://api-maps.yandex.ru/2.1/?lang=ru_RU${KEY ? "&apikey=" + encodeURIComponent(KEY) : ""}`;
+  const s = document.createElement("script");
+  s.src = src;
+  s.async = true;
+  s.onerror = function () {
+    console.warn("[Maps] Не удалось загрузить Яндекс.Карты");
+  };
+  s.onload = function () {
+    if (window.ymaps && window.ymaps.ready) {
+      window.ymaps.ready(initMapInstance);
+    }
+  };
+  document.head.appendChild(s);
+
+  // Базовая инициализация карты (координаты — примеры, замени на свои при необходимости)
+  function initMapInstance() {
+    if (!window.ymaps) return;
+    try {
+      const map = new ymaps.Map(mapEl, {
+        center: [56.829805, 60.599889],
+        zoom: 10,
+        controls: ["zoomControl"]
+      });
+
+      const placemark = new ymaps.Placemark([56.829805, 60.599889], {
+        balloonContent: "Тренер Семён Волкомуров"
+      }, { preset: "islands#redDotIcon" });
+
+      map.geoObjects.add(placemark);
+    } catch (e) {
+      console.error("[Maps] init error:", e);
+    }
+  }
 })();
