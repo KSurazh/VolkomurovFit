@@ -62,35 +62,28 @@ function showInlineStatus(box, msg, type = "info", timeoutMs = 5000) {
 }
 
 /* ====== ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ ====== */
-(function initTheme() {
-  const btn = $("#themeToggle, #theme-toggle, [data-role='theme-toggle']");
-  const KEY = "theme-mode"; // 'auto' | 'dark' | 'light'
-  const mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+document.addEventListener("DOMContentLoaded", () => {
+    const themeToggleBtn = document.getElementById("theme-toggle");
 
-  const getMode = () => localStorage.getItem(KEY) || "auto";
-  const sysDark = () => (mq ? mq.matches : false);
-
-  const apply = (mode) => {
-    const useDark = mode === "dark" || (mode === "auto" && sysDark());
-
-    document.documentElement.classList.toggle("dark", useDark);
-    document.body.classList.toggle("dark", useDark);
-    document.documentElement.classList.toggle("theme-dark", useDark);
-    document.documentElement.classList.toggle("theme-light", !useDark);
-
-    updateMetaThemeColor(useDark ? "#0f0f10" : "#ffffff");
-
-    if (btn) {
-      const label = mode === "auto" ? "🌓" : useDark ? "🌙" : "☀️";
-      btn.setAttribute("aria-label", `Тема: ${mode}`);
-      btn.textContent = label;
+    // При загрузке страницы проверяем сохранённую тему
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-theme");
     }
-  };
 
-  const setMode = (mode) => {
-    localStorage.setItem(KEY, mode);
-    apply(mode);
-  };
+    // Обработчик переключения
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark-theme");
+            
+            // Сохраняем текущее состояние
+            if (document.body.classList.contains("dark-theme")) {
+                localStorage.setItem("theme", "dark");
+            } else {
+                localStorage.setItem("theme", "light");
+            }
+        });
+    }
+});
 
   // первичная инициализация
   apply(getMode());
@@ -320,7 +313,7 @@ function showInlineStatus(box, msg, type = "info", timeoutMs = 5000) {
     try {
       const map = new ymaps.Map(mapEl, {
         center: [56.829805, 60.599889],
-        zoom: 10,
+        zoom: 14,
         controls: ["zoomControl"]
       });
 
