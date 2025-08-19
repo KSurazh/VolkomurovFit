@@ -6,11 +6,6 @@
    - Загрузка и инициализация Яндекс.Карт
    ---------------------------------------------------------
 
-/* ====== КОНФИГ (замените значения на свои при необходимости) ====== */
-const TELEGRAM_BOT_TOKEN_FALLBACK = "8264991850:AAFsRTvk2-YI005iLiuSS5MtS8Wc9sRsVsY";
-const TELEGRAM_CHAT_ID_FALLBACK   = "-1004851383447";
-const YANDEX_MAPS_API_KEY_FALLBACK = "6dca7c55-faf3-42a1-abf8-c8af616e421e";
-
 /* ====== УТИЛИТЫ ====== */
 const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
